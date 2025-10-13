@@ -58,4 +58,4 @@ const booking = sequelize.define("bookings", {
   },
 });
 
-module.exports = refferal;
+module.exports = booking;

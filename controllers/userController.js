@@ -110,21 +110,21 @@ exports.signUp = async(req, res) => {
   try {
     const {mobile, device, password, fcmtokens, idToken} = req.body;
 
-    // if (!idToken) {
-    //   return res.status(400).json({ error: 'ID token is required.' });
-    // }
+    if (!idToken) {
+      return res.status(400).json({ error: 'ID token is required.' });
+    }
 
     if (!mobile || !password) {
       return res.status(400).json({ message: 'Mobile and password are required.' });
     }
 
   // Verify the Firebase credential
-  // const decodedToken = await admin.auth().verifyIdToken(idToken);
-  // console.log(decodedToken.phone_number)
-  // Check if the phone number matches
-  // if (!decodedToken.phone_number || decodedToken.phone_number !== "+91"+mobile) {
-  //   return res.status(401).json({ error: 'Mobile number does not match with verified token.' });
-  // }
+  const decodedToken = await admin.auth().verifyIdToken(idToken);
+  console.log(decodedToken.phone_number)
+  //Check if the phone number matches
+  if (!decodedToken.phone_number || decodedToken.phone_number !== "+91"+mobile) {
+    return res.status(401).json({ error: 'Mobile number does not match with verified token.' });
+  }
 
   let newToken = null;
     if(fcmtokens && Array.isArray(fcmtokens)){
