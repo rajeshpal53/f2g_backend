@@ -1,6 +1,8 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/database");
 const User = require("../models/user");
+const Status = require("../models/status");
+const LoanType = require("../models/loanType");
 
 const booking = sequelize.define("bookings", {
   id: {
@@ -10,7 +12,7 @@ const booking = sequelize.define("bookings", {
   },
   name: {
     type: DataTypes.STRING,
-    allowNull: false,
+    allowNull: true,
   },
   usersfk: {
     type: DataTypes.INTEGER,
@@ -22,7 +24,7 @@ const booking = sequelize.define("bookings", {
   },
   bookedBy: {
     type: DataTypes.INTEGER,
-    allowNull: false,
+    allowNull: true,
     references: {
       model: User,
       key: "id",
@@ -40,9 +42,13 @@ const booking = sequelize.define("bookings", {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  loanType: {
-    type: DataTypes.ENUM('1', '2'),
+  loantypefk: {
+    type: DataTypes.INTEGER,
     allowNull: false,
+    references: {
+      model: LoanType,
+      key: 'id',
+    },
   },
   address: {
     type: DataTypes.STRING(255),
@@ -50,12 +56,20 @@ const booking = sequelize.define("bookings", {
   },
   remark: {
     type: DataTypes.TEXT,
-    allowNull: false,
+    allowNull: true,
   },
   bookId: {
     type: DataTypes.STRING,
     allowNull: false,
   },
+  statusfk: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    references: {
+      model: Status,
+      key: 'id',
+    },
+  },
 });
 
-module.exports = refferal;
+module.exports = booking;
