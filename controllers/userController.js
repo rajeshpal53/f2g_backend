@@ -7,7 +7,6 @@ const admin = require('../config/firebase');
 const { Op } = require('sequelize');
 const sequelize = require("../config/database");
 
-
 exports.getAllUsers = async (req, res) => {
   try {
     let { page, limit } = req.query;
@@ -273,6 +272,27 @@ exports.logout = async (req, res) => {
   } catch (err) {
     console.log("error :", err);
     return res.status(500).json({ error: err.message });
+  }
+};
+
+// Upsert user by mobile number
+exports.upsertOnlyUser = async (mobile, name, address, password, transaction) => {
+
+  try {
+      const hashedPassword = await bcrypt.hash(password, 10);
+      // Mobile number does not exist, create a new user
+      let user = await User.create({
+        mobile,
+        name,
+        address,
+        password: hashedPassword
+      },
+      { transaction });
+    
+    return user;
+  } catch (err) {
+    console.log("error is:-", err);
+    return ({ error: err.message });
   }
 };
 

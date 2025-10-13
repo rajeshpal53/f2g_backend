@@ -3,6 +3,8 @@ const bodyParser = require('body-parser');
 const userRoutes = require('./routes/userRoutes');
 const statusRoutes = require('./routes/statusRoutes');
 const feedBackRoutes = require('./routes/feedBackRoutes');
+const bookingRoutes = require('./routes/bookingRoutes');
+const refferalRoutes = require('./routes/refferalRoutes');
 
 const cors = require('cors');
 
@@ -18,6 +20,8 @@ app.use(cors());
 app.use('/api/users', userRoutes);
 app.use('/api/status', statusRoutes); // Mount the routes
 app.use('/api/feedback', feedBackRoutes);
+app.use('/api/booking', bookingRoutes);
+app.use('/api/refferal', refferalRoutes);
 
 // Start server
 app.listen(PORT, () => {
