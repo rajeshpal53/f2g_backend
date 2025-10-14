@@ -226,10 +226,8 @@ exports.getRefferal = async (req, res) => {
     if (searchTerm && searchTerm.trim() !== ""){
       whereClause[Op.or]= [
         // Adjust the fields to search based on your model
-        { bookingAmount: { [Op.like]: `%${searchTerm}%` } },
-        { tentativeBillAmount: { [Op.like]: `%${searchTerm}%` } },
-        { loanAccountNumber: { [Op.like]: `%${searchTerm}%` } },
-        { bookId: { [Op.like]: `%${searchTerm}%` } },
+        { loanAmount: { [Op.like]: `%${searchTerm}%` } },
+        { refId: { [Op.like]: `%${searchTerm}%` } },
         { "$user.name$": { [Op.like]: `%${searchTerm}%` } },
         { "$user.mobile$": { [Op.like]: `%${searchTerm}%` } },
         { "$user.address$": { [Op.like]: `%${searchTerm}%` } },
@@ -265,7 +263,8 @@ exports.getRefferal = async (req, res) => {
       order: orderCondition,
       //distinct: true,
       limit: pageSize,
-      offset: offset
+      offset: offset,
+      subQuery: false
     });
 
     return res.status(200).json({
