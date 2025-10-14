@@ -89,7 +89,7 @@ exports.createRefferal = async (req, res) => {
 
 exports.getRefferal = async (req, res) => {
   try {
-    let { dateRange, statusfk, startDate, endDate, year, month, week, calenderView, sort, sortField, searchTerm, id, usersfk, loantypefk, page, limit } = req.query;
+    let { dateRange, statusfk, startDate, endDate, year, month, week, calenderView, sort, sortField, searchTerm, id, usersfk, refferedBy, loantypefk, page, limit } = req.query;
     let whereClause = {};
 
      // let sortFields = sortField;
@@ -208,6 +208,10 @@ exports.getRefferal = async (req, res) => {
 
     if(usersfk){
       whereClause.usersfk = usersfk;
+    }
+
+    if(refferedBy){
+      whereClause.refferedBy = refferedBy;
     }
 
     // Try to parse the search term as a date (assuming YYYY-MM-DD format)

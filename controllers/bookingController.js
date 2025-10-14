@@ -93,7 +93,7 @@ exports.createBooking = async (req, res) => {
 
 exports.getBooking = async (req, res) => {
   try {
-    let { dateRange, statusfk, startDate, endDate, year, month, week, calenderView, sort, sortField, searchTerm, id, usersfk, loantypefk, page, limit } = req.query;
+    let { dateRange, statusfk, startDate, endDate, year, month, week, calenderView, sort, sortField, searchTerm, id, usersfk, bookedBy, loantypefk, page, limit } = req.query;
     let whereClause = {};
 
      // let sortFields = sortField;
@@ -212,6 +212,10 @@ exports.getBooking = async (req, res) => {
 
     if(usersfk){
       whereClause.usersfk = usersfk;
+    }
+
+    if(bookedBy){
+      whereClause.bookedBy = bookedBy;
     }
 
     // Try to parse the search term as a date (assuming YYYY-MM-DD format)
