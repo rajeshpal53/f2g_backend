@@ -36,6 +36,9 @@ exports.createRefferal = async (req, res) => {
       user = await userController.upsertOnlyUser(mobile, name, address, password, transaction);
     }
 
+    const date = new Date();
+    const formattedDate = `${String(date.getDate()).padStart(2, '0')}${String(date.getMonth() + 1).padStart(2, '0')}${date.getFullYear()}`;
+
     // Create Invoice
     const refferal = await Refferal.create(
       {
@@ -46,7 +49,7 @@ exports.createRefferal = async (req, res) => {
         loantypefk,
         address,
         remark,
-        refId,
+        refId : `ref-${formattedDate}-${user.id}`,
         statusfk
       },
       { transaction }
