@@ -17,11 +17,11 @@ const PORT = process.env.PORT || 3001;
 app.use(bodyParser.json());
 app.use(cors());
 // Routes
-app.use('/api/users', userRoutes);
-app.use('/api/status', statusRoutes); // Mount the routes
-app.use('/api/feedback', feedBackRoutes);
-app.use('/api/booking', bookingRoutes);
-app.use('/api/refferal', refferalRoutes);
+app.use('/fapi/users', userRoutes);
+app.use('/fapi/status', statusRoutes); // Mount the routes
+app.use('/fapi/feedback', feedBackRoutes);
+app.use('/fapi/booking', bookingRoutes);
+app.use('/fapi/refferal', refferalRoutes);
 
 // Start server
 app.listen(PORT, () => {

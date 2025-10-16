@@ -24,7 +24,7 @@ Booking.belongsTo(Status, {foreignKey: 'statusfk', as: 'status'});
 Booking.belongsTo(LoanType, {foreignKey: 'loantypefk', as: 'loantype'});
 Booking.belongsTo(User, { foreignKey: 'bookedBy', as: 'bookedByUser' });
 
-Refferal.hasMany(Status, {foreignKey: 'statusfk', as: 'status'});
+Refferal.belongsTo(Status, {foreignKey: 'statusfk', as: 'status'});
 Refferal.belongsTo(User, {foreignKey: 'usersfk', as: 'user'});
 Refferal.belongsTo(LoanType, {foreignKey: 'loantypefk', as: 'loantype'});
 Refferal.belongsTo(User, {foreignKey: 'refferedBy', as: 'refferedByUser'});

@@ -10,5 +10,6 @@ router.post('/', refferalController.createRefferal); // Create
 router.put('/:id', refferalController.updateRefferal); // Update
 router.delete('/:id', refferalController.deleteRefferal); // Delete
 router.get('/', refferalController.getRefferal); // get
+router.get('/getRefferalStats', refferalController.getRefferalStats);
 
 module.exports = router;

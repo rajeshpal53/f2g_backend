@@ -4,7 +4,7 @@ const userController = require('./userController');
 const User = require("../models/user");
 const Status = require('../models/status');
 const LoanType = require('../models/loanType');
-const { Op } = require("sequelize");
+const { Op, Sequelize } = require("sequelize");
 const moment = require('moment');
 
 // create booking
@@ -283,6 +283,151 @@ exports.getBooking = async (req, res) => {
   } catch (error) {
     console.error(error);
     return res.status(500).json({ success: false, message: 'Server error' });
+  }
+};
+
+exports.getBookingStats = async (req, res) => {
+  try {
+    const { dateRange, startDate, endDate, year, month, bookedBy, usersfk } = req.query;
+
+    // Base where clause
+    let whereClause = {};
+    
+    if(bookedBy){
+      whereClause.bookedBy = bookedBy;
+    }
+
+    if(usersfk){
+      whereClause.usersfk = usersfk;
+    }
+
+    const today = moment().endOf('day');
+
+    if (startDate && endDate) {
+      // Custom range
+      const start = moment(startDate, "DD-MM-YYYY").startOf('day');
+      const end = moment(endDate, "DD-MM-YYYY").endOf('day');
+
+      if (!start.isValid() || !end.isValid()) {
+        return res.status(400).json({ success: false, message: "Invalid date format. Use DD-MM-YYYY." });
+      }
+
+      whereClause.createdAt = {
+        [Op.between]: [start.toDate(), end.toDate()]
+      };
+    } else if (year && month) {
+      const start = moment(`${year}-${month}-01`, "YYYY-MM-DD").startOf('month');
+      const end = start.clone().endOf('month');
+
+      if (!start.isValid()) {
+        return res.status(400).json({ success: false, message: "Invalid year or month." });
+      }
+
+      whereClause.createdAt = {
+        [Op.between]: [start.toDate(), end.toDate()]
+      };
+
+    // 3. Year only
+    } else if (year) {
+      const start = moment(`${year}-01-01`, "YYYY-MM-DD").startOf('year');
+      const end = start.clone().endOf('year');
+
+      whereClause.createdAt = {
+        [Op.between]: [start.toDate(), end.toDate()]
+      };
+
+    // 4. Predefined Ranges
+    } else if (dateRange) {
+      let fromDate;
+
+      switch (dateRange) {
+        case 'week':
+          fromDate = moment().startOf('week').toDate();
+          break;
+        case 'month':
+          fromDate = moment().startOf('month').toDate();
+          break;
+        case 'year':
+          fromDate = moment().startOf('year').toDate();
+          break;
+        default:
+          return res.status(400).json({ success: false, message: 'Invalid date range' });
+      }
+
+      whereClause.createdAt = {
+        [Op.between]: [fromDate, today.toDate()]
+      };
+    }
+
+    const { count, rows: bookings } = await Booking.findAndCountAll({
+      where: whereClause,
+      //distinct: true, 
+      include: [
+        {model: Status, as: 'status'},
+        {model : User, as : 'user'},
+        {model : User , as : 'bookedByUser'},
+        {model : LoanType , as : 'loantype'}
+      ]
+    });    
+
+     // If no bookings, return zero stats
+    if (count === 0) {
+     return res.status(200).json({
+       success: true,
+       noOfBookings: 0,
+       statusWiseBookings: {}
+     });
+    }
+  
+    // --- STATUS-WISE COUNTS ---
+    const statusWiseBookings = await Booking.findAll({
+      where: whereClause,
+      attributes: [
+        "statusfk",
+        [Sequelize.fn("COUNT", Sequelize.col("bookings.statusfk")), "count"],
+      ],
+      include: [{ model: Status, as: "status", attributes: ["status"] }],
+      group: ["bookings.statusfk", "status.status"],
+      raw: true,
+    });
+
+    const statusStats = {};
+    statusWiseBookings.forEach((s) => {
+      statusStats[s["status.status"]] = parseInt(s.count, 10);
+    });
+
+    let monthlyBookings = [];
+
+    if (year && !month && !startDate && !endDate && !dateRange) {
+      for (let m = 0; m < 12; m++) {
+        const start = moment(`${year}-${m + 1}-01`, "YYYY-MM-DD").startOf('month');
+        const end = start.clone().endOf('month');
+      
+        const bookings = await Booking.count({
+          where: {
+            createdAt: {
+              [Op.between]: [start.toDate(), end.toDate()]
+            }
+          },
+        });
+      
+        monthlyBookings.push({
+          month: start.format("MMM"),
+          noOfBookings: bookings || 0
+        });
+      }
+    }
+
+    return res.status(200).json({
+      success: true,
+      totalBookings: count,
+      statusWiseBookings: statusStats,
+      ...(monthlyBookings.length > 0 && { monthlyBookings }) // only include if present
+    });
+
+  } catch (error) {
+    console.error("Error fetching booking stats:", error);
+    return res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
   
