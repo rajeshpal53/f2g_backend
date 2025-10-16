@@ -370,7 +370,8 @@ exports.getRefferalStats = async (req, res) => {
      return res.status(200).json({
        success: true,
        noOfRefferals: 0,
-       statusWiseRefferals: {}
+       statusWiseRefferals: {},
+       loanTypeWiseRefferals: {}
      });
     }
   
@@ -389,6 +390,23 @@ exports.getRefferalStats = async (req, res) => {
     const statusStats = {};
     statusWiseRefferals.forEach((s) => {
       statusStats[s["status.status"]] = parseInt(s.count, 10);
+    });
+
+    // --- loan type-WISE COUNTS ---
+    const loanTypeWiseRefferals = await Refferal.findAll({
+      where: whereClause,
+      attributes: [
+        "loantypefk",
+        [Sequelize.fn("COUNT", Sequelize.col("refferals.loantypefk")), "count"],
+      ],
+      include: [{model : LoanType , as : 'loantype', attributes: ["type"] }],
+      group: ["refferals.loantypefk", "loantype.type"],
+      raw: true,
+    });
+
+    const loanTypeStats = {};
+    loanTypeWiseRefferals.forEach((s) => {
+      loanTypeStats[s["loantype.type"]] = parseInt(s.count, 10);
     });
 
     let monthlyRefferals = [];
@@ -417,6 +435,7 @@ exports.getRefferalStats = async (req, res) => {
       success: true,
       totalRefferals: count,
       statusWiseRefferals: statusStats,
+      loanTypeWiseRefferals: loanTypeStats,
       ...(monthlyRefferals.length > 0 && { monthlyRefferals }) // only include if present
     });
 

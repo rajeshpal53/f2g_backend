@@ -375,7 +375,8 @@ exports.getBookingStats = async (req, res) => {
      return res.status(200).json({
        success: true,
        noOfBookings: 0,
-       statusWiseBookings: {}
+       statusWiseBookings: {},
+       loanTypeWiseBookings: {}
      });
     }
   
@@ -394,6 +395,23 @@ exports.getBookingStats = async (req, res) => {
     const statusStats = {};
     statusWiseBookings.forEach((s) => {
       statusStats[s["status.status"]] = parseInt(s.count, 10);
+    });
+    
+    // --- loan type-WISE COUNTS ---
+    const loanTypeWiseBookings = await Booking.findAll({
+      where: whereClause,
+      attributes: [
+        "loantypefk",
+        [Sequelize.fn("COUNT", Sequelize.col("bookings.loantypefk")), "count"],
+      ],
+      include: [{model : LoanType , as : 'loantype', attributes: ["type"] }],
+      group: ["bookings.loantypefk", "loantype.type"],
+      raw: true,
+    });
+
+    const loanTypeStats = {};
+    loanTypeWiseBookings.forEach((s) => {
+      loanTypeStats[s["loantype.type"]] = parseInt(s.count, 10);
     });
 
     let monthlyBookings = [];
@@ -422,6 +440,7 @@ exports.getBookingStats = async (req, res) => {
       success: true,
       totalBookings: count,
       statusWiseBookings: statusStats,
+      loanTypeWiseBookings: loanTypeStats,
       ...(monthlyBookings.length > 0 && { monthlyBookings }) // only include if present
     });
 
