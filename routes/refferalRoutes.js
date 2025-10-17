@@ -11,5 +11,6 @@ router.put('/:id', refferalController.updateRefferal); // Update
 router.delete('/:id', refferalController.deleteRefferal); // Delete
 router.get('/', refferalController.getRefferal); // get
 router.get('/getRefferalStats', refferalController.getRefferalStats);
+router.get('/downloadRefferals', refferalController.downloadRefferals);
 
 module.exports = router;

@@ -11,5 +11,6 @@ router.put('/:id', bookingController.updateBooking); // Update
 router.delete('/:id', bookingController.deleteBooking); // Delete
 router.get('/', bookingController.getBooking); // get
 router.get('/getBookingStats', bookingController.getBookingStats);
+router.get('/downloadBookings', bookingController.downloadBookings);
 
 module.exports = router;
