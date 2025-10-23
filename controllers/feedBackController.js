@@ -18,7 +18,7 @@ exports.createFeedBack = async (req, res) => {
       const feedBack = await FeedBack.create(feedBackData);
 
       if (feedBack.feedbackType !== "Comment") {
-        // utility.sendAdminFeedBackMail(feedBack);
+        utility.sendAdminFeedBackMail(feedBack);
       }
 
       return res.status(201).json(feedBack);
@@ -148,7 +148,7 @@ exports.createFeedBack = async (req, res) => {
         // Check if an image was uploaded and processed
         if (feedBack.screenShotUrl) {
         if (req.savedFiles?.screenShotUrl) {
-          const baseUploadPath = process.env.UPLOAD_PATH || path.join(__dirname, '../../f2g/assets');
+          const baseUploadPath = process.env.UPLOAD_PATH || path.join(__dirname, '../../f2g-frontend/assets');
           
           // Construct the full path to the old file
           const oldImagePath = path.join(baseUploadPath, feedBack.screenShotUrl.replace('assets/', ''));    
@@ -174,7 +174,16 @@ exports.createFeedBack = async (req, res) => {
           screenShotUrl
         };
 
+        // Track if feedback isResolved changes from false → true
+        const wasResolved = feedBack.isResolved;
+        const willBeResolved = body.isResolved;
+
         await feedBack.update(updatedData);
+
+        // Send mail only if isResolved turned true
+        if (!wasResolved && willBeResolved === true && feedBack.email) {
+          utility.sendFeedBackResolvedMailToUser(feedBack);
+        }
 
         return res.status(200).json(feedBack);
     } catch (error) {
@@ -192,7 +201,7 @@ exports.createFeedBack = async (req, res) => {
         }
     
         if(feedBack.screenShotUrl){
-          const baseUploadPath = process.env.UPLOAD_PATH || path.join(__dirname, '../../f2g/assets');
+          const baseUploadPath = process.env.UPLOAD_PATH || path.join(__dirname, '../../f2g-frontend/assets');
             
           // Construct the full path to the old file
           const oldImagePath = path.join(baseUploadPath, feedBack.screenShotUrl.replace('assets/', ''));    
