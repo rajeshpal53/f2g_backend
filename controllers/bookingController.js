@@ -8,6 +8,7 @@ const { Op, Sequelize } = require("sequelize");
 const moment = require('moment');
 const ExcelJS = require("exceljs");
 const { downloadReport } = require("../utility/report");
+const utility = require('../utility/utility');
 
 // create booking
 exports.createBooking = async (req, res) => {
@@ -63,6 +64,8 @@ exports.createBooking = async (req, res) => {
     
     await transaction.commit(); // Commit the transaction
 
+    utility.sendCreateBookingNotificationToAdmin(req);
+
     res.status(201).json(booking);
   } catch (error) {
     await transaction.rollback(); // Rollback on error
@@ -71,30 +74,33 @@ exports.createBooking = async (req, res) => {
   }
 };
   
-  // Update a feedback
-  exports.updateBooking = async (req, res) => {
-    try {
-        const { id } = req.params;
-        const body = req.body;
-
-        // Find the feedback by primary key
-        const booking = await Booking.findByPk(id);
-        if (!booking) {
-          return res.status(404).json({ message: 'booking not found' });
-        }
-        
-        await booking.update(body);
-
-         return res.status(200).json({
-          success: true,
-          message: 'Booking updated successfully',
-          data: booking
-        });
-    } catch (error) {
-        console.log("error is:- ", error);  
-        return res.status(400).json({ error: error.message });
+// Update a feedback
+exports.updateBooking = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const body = req.body;
+    // Find the feedback by primary key
+    const booking = await Booking.findByPk(id);
+    if (!booking) {
+      return res.status(404).json({ message: 'booking not found' });
     }
-  };
+    const previousStatus = booking.statusfk;
+    
+    await booking.update(body);
+    // If status has changed, send notification
+    if (body.statusfk && body.statusfk !== previousStatus) {
+      utility.sendStatusNotification(req, booking, "booking");
+    }
+    return res.status(200).json({
+      success: true,
+      message: 'Booking updated successfully',
+      data: booking
+    });
+  } catch (error) {
+      console.log("error is:- ", error);  
+      return res.status(400).json({ error: error.message });
+  }
+};
 
 exports.getBooking = async (req, res) => {
   try {

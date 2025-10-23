@@ -8,7 +8,7 @@ const FeedBack = sequelize.define('Feedback', {
     primaryKey: true,
   },
   feedbackType: {
-    type: DataTypes.ENUM('Complaint', 'Questions', 'Suggestion', 'Comment', 'Feature Request', 'Bug Report'),
+    type: DataTypes.ENUM('Complaint', 'Questions', 'Suggestion', 'Comment', 'Feature Request', 'Bug Report', 'Others'),
     allowNull: false,
   },
   isResolved: {

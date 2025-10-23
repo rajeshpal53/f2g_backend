@@ -5,6 +5,7 @@ const statusRoutes = require('./routes/statusRoutes');
 const feedBackRoutes = require('./routes/feedBackRoutes');
 const bookingRoutes = require('./routes/bookingRoutes');
 const refferalRoutes = require('./routes/refferalRoutes');
+require('./utility/cronJobs');
 
 const cors = require('cors');
 

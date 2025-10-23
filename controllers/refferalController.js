@@ -8,6 +8,7 @@ const { Op, Sequelize } = require("sequelize");
 const moment = require('moment');
 const ExcelJS = require("exceljs");
 const { downloadReport } = require("../utility/report");
+const utility = require('../utility/utility');
 
 // create booking
 exports.createRefferal = async (req, res) => {
@@ -59,6 +60,8 @@ exports.createRefferal = async (req, res) => {
     
     await transaction.commit(); // Commit the transaction
 
+    utility.sendCreateRefferalNotificationToAdmin(req);
+
     res.status(201).json(refferal);
   } catch (error) {
     await transaction.rollback(); // Rollback on error
@@ -67,30 +70,34 @@ exports.createRefferal = async (req, res) => {
   }
 };
   
-  // Update a feedback
-  exports.updateRefferal = async (req, res) => {
-    try {
-        const { id } = req.params;
-        const body = req.body;
+// Update a feedback
+exports.updateRefferal = async (req, res) => {
+  try {
+      const { id } = req.params;
+      const body = req.body;
+      // Find the feedback by primary key
+      const refferal = await Refferal.findByPk(id);
+      if (!refferal) {
+        return res.status(404).json({ message: 'refferal not found' });
+      }
 
-        // Find the feedback by primary key
-        const refferal = await Refferal.findByPk(id);
-        if (!refferal) {
-          return res.status(404).json({ message: 'refferal not found' });
-        }
-        
-        await refferal.update(body);
-
-         return res.status(200).json({
-          success: true,
-          message: 'refferal updated successfully',
-          data: refferal
-        });
-    } catch (error) {
-        console.log("error is:- ", error);  
-        return res.status(400).json({ error: error.message });
-    }
-  };
+      const previousStatus = refferal.statusfk;
+      
+      await refferal.update(body);
+      // If status has changed, send notification
+      if (body.statusfk && body.statusfk !== previousStatus) {
+        utility.sendStatusNotification(req, refferal, "refferal");
+      }
+      return res.status(200).json({
+        success: true,
+        message: 'refferal updated successfully',
+        data: refferal
+      });
+  } catch (error) {
+      console.log("error is:- ", error);  
+      return res.status(400).json({ error: error.message });
+  }
+};
 
 exports.getRefferal = async (req, res) => {
   try {
