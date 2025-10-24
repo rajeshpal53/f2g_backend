@@ -27,7 +27,7 @@ exports.sendCreateBookingNotificationToAdmin = async(req) => {
         body: "A new booking has been created. Please verify and approve.",
         tokens: tokens, // Send notification to all aggregated tokens
         extraData: "AdminSection",
-        image: "https://f2gfinance.com/assets/dailysabji.png",
+        image: "https://f2gfinance.com/f2g_logo.jpg",
         screen: "AdminSection",
       };
 
@@ -81,7 +81,7 @@ exports.sendStatusNotification = async (req, entity, entityType) => {
       title: `${entityName} Status Update`,
       body,
       extraData: screen,
-      image: "https://f2gfinance.com/assets/f2g.png",
+      image: "https://f2gfinance.com/f2g_logo.jpg",
       screen,
     };
 
@@ -103,7 +103,7 @@ exports.sendCreateRefferalNotificationToAdmin = async(req) => {
         body: "A new refferal has been created. Please verify and approve.",
         tokens: tokens, // Send notification to all aggregated tokens
         extraData: "AdminSection",
-        image: "https://f2gfinance.com/assets/dailysabji.png",
+        image: "https://f2gfinance.com/f2g_logo.jpg",
         screen: "AdminSection",
       };
 
