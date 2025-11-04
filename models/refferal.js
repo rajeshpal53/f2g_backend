@@ -50,6 +50,10 @@ const refferal = sequelize.define("refferals", {
     type: DataTypes.TEXT,
     allowNull: true,
   },
+  description: {
+    type: DataTypes.TEXT,
+    allowNull: true,
+  },
   refId: {
     type: DataTypes.STRING,
     allowNull: false,

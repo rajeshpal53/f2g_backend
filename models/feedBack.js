@@ -20,6 +20,10 @@ const FeedBack = sequelize.define('Feedback', {
     type: DataTypes.TEXT,
     allowNull: false,
   },
+  resolvedMessage: {
+    type: DataTypes.TEXT,
+    allowNull: true,
+  },
   name: {
     type: DataTypes.STRING,
     allowNull: false,
