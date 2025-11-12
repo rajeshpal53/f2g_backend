@@ -6,6 +6,8 @@ const bcrypt = require('bcryptjs');
 const admin = require('../config/firebase');
 const { Op } = require('sequelize');
 const sequelize = require("../config/database");
+const fs = require('fs');
+const path = require('path');
 
 exports.getAllUsers = async (req, res) => {
   try {
@@ -298,7 +300,7 @@ exports.upsertOnlyUser = async (mobile, name, address, password, transaction) =>
 
 // Upsert user by mobile number with file upload support
 exports.upsertOnlyUserProfileImg = async (req, res) => {
-  const { mobile, ...body } = req.body;
+  const { mobile, removeProfilePic, removeAadharFront, removeAadharBack, ...body } = req.body;
 
   try {
     if (!mobile) {
@@ -309,9 +311,44 @@ exports.upsertOnlyUserProfileImg = async (req, res) => {
     let user = await User.findOne({ where: { mobile } });
 
     // Handle file paths for uploaded files
-    const profilePicurl = req.savedFiles?.profilePicurl ?? user?.profilePicurl ?? null;
-    const aadharCardFronturl = req.savedFiles?.aadharCardFronturl ?? user?.aadharCardFronturl ?? null;
-    const aadharCardBackurl = req.savedFiles?.aadharCardBackurl ?? user?.aadharCardBackurl ?? null;
+    let profilePicurl = req.savedFiles?.profilePicurl ?? user?.profilePicurl ?? null;
+    let aadharCardFronturl = req.savedFiles?.aadharCardFronturl ?? user?.aadharCardFronturl ?? null;
+    let aadharCardBackurl = req.savedFiles?.aadharCardBackurl ?? user?.aadharCardBackurl ?? null;
+
+    const baseUploadPath = process.env.UPLOAD_PATH || path.join(__dirname, '../../f2g-frontend/assets');
+
+    // Helper to handle removals
+    const handleFileRemoval = async (flag, currentUrl, fieldName) => {
+      if (flag === 'true' || flag === true) {
+        if (currentUrl) {
+          const oldImagePath = path.join(
+            baseUploadPath,
+            currentUrl.replace('assets/', '')
+          );
+          console.log(`Removing old ${fieldName}:`, oldImagePath);
+          await deleteFileIfExists(oldImagePath);
+        }
+        return null;
+      }
+      return currentUrl;
+    };
+
+    // Process file removals
+    profilePicurl = await handleFileRemoval(
+      removeProfilePic,
+      profilePicurl,
+      'profile picture'
+    );
+    aadharCardFronturl = await handleFileRemoval(
+      removeAadharFront,
+      aadharCardFronturl,
+      'Aadhar front'
+    );
+    aadharCardBackurl = await handleFileRemoval(
+      removeAadharBack,
+      aadharCardBackurl,
+      'Aadhar back'
+    );
 
     // Prepare updated/inserted data
     const upsertData = {
@@ -337,6 +374,18 @@ exports.upsertOnlyUserProfileImg = async (req, res) => {
     return res.status(500).json({ message: 'Error upserting user', error: error.message || error });
   }
 };
+
+async function deleteFileIfExists(filePath) {
+  try {
+    await fs.promises.access(filePath);
+    await fs.promises.unlink(filePath);
+    console.log(`Deleted file: ${filePath}`);
+  } catch (err) {
+    if (err.code !== 'ENOENT') {
+      console.error(`Error deleting file (${filePath}):`, err.message);
+    }
+  }
+}
 
 function storeToken(res, token) {
   //production
