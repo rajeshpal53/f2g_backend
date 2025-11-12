@@ -22,7 +22,7 @@ exports.createBooking = async (req, res) => {
     mobile,
     address,
     remark,
-    bookId,
+    bankOrNBFCName,
     statusfk
   } = req.body;
 
@@ -56,6 +56,7 @@ exports.createBooking = async (req, res) => {
         loantypefk,
         address,
         remark,
+        bankOrNBFCName,
         bookId : `bk-${formattedDate}-${user.id}`,
         statusfk
       },

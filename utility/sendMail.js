@@ -118,10 +118,10 @@ exports.sendUserFeedBackResolvedMail = (feedBack) => {
             <li><strong>Resolved On:</strong> ${new Date(feedBack.updatedAt).toLocaleString()}</li>
           </ul>
 
-          ${feedBack.resolutionNote ? `
+          ${feedBack.resolvedMessage ? `
             <h3>Resolution Note:</h3>
             <p style="background:#f8f9fa; padding:10px; border-left:4px solid #28a745; border-radius:4px;">
-              ${feedBack.resolutionNote}
+              ${feedBack.resolvedMessage}
             </p>
           ` : ''}
 

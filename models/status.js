@@ -8,7 +8,7 @@ const Status = sequelize.define('Statuses', {
     autoIncrement: true,
   },
   status: {
-    type: DataTypes.ENUM('login incomplete', 'login done', 'post paid doc', 'reject', 'l and t stage', 'sub approved', 'approved', 'disbursed', 'otc/pdd pending', 'billing in process', 'billing cleared'),
+    type: DataTypes.ENUM('login incomplete', 'login done', 'pd doc', 'reject', 'l and t stage', 'sub approved', 'approved', 'disbursed', 'otc/pdd pending', 'billing in process', 'billing cleared', 'lead generated', 'booking initiated'),
     allowNull: false,
   },
 });

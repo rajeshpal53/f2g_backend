@@ -42,6 +42,10 @@ const booking = sequelize.define("bookings", {
     type: DataTypes.STRING,
     allowNull: false,
   },
+  bankOrNBFCName: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
   loantypefk: {
     type: DataTypes.INTEGER,
     allowNull: false,
@@ -55,6 +59,10 @@ const booking = sequelize.define("bookings", {
     allowNull: true,
   },
   remark: {
+    type: DataTypes.TEXT,
+    allowNull: true,
+  },
+  description: {
     type: DataTypes.TEXT,
     allowNull: true,
   },

@@ -20,7 +20,6 @@ exports.createRefferal = async (req, res) => {
     mobile,
     address,
     remark,
-    refId,
     statusfk
   } = req.body;
 

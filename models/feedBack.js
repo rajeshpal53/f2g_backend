@@ -8,7 +8,7 @@ const FeedBack = sequelize.define('Feedback', {
     primaryKey: true,
   },
   feedbackType: {
-    type: DataTypes.ENUM('Complaint', 'Questions', 'Suggestion', 'Comment', 'Feature Request', 'Bug Report', 'Others'),
+    type: DataTypes.ENUM('Complaint', 'Questions', 'Suggestion', 'Comment', 'Feature Request', 'Bug Report', 'Others', 'Loan Requirement'),
     allowNull: false,
   },
   isResolved: {
@@ -19,6 +19,10 @@ const FeedBack = sequelize.define('Feedback', {
   description: {
     type: DataTypes.TEXT,
     allowNull: false,
+  },
+  resolvedMessage: {
+    type: DataTypes.TEXT,
+    allowNull: true,
   },
   name: {
     type: DataTypes.STRING,
@@ -34,6 +38,9 @@ const FeedBack = sequelize.define('Feedback', {
     validate: {
       isEmail: true,
     },
+  },
+  address: {
+    type: DataTypes.STRING,
   },
   screenShotUrl: {
       type: DataTypes.STRING,

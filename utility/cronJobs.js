@@ -21,7 +21,7 @@ cron.schedule('0 9 * * *', async () => {
           body: 'Don’t miss out on benefits!',
           tokens: user?.fcmtokens,
           extraData: 'Daily Notification',
-          image: 'https://f2gfinance.com/assets/f2g.png',
+          image: 'https://f2gfinance.com/f2g_logo.jpg',
           screen: "Home",
         };
 
