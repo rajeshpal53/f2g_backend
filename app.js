@@ -5,6 +5,8 @@ const statusRoutes = require('./routes/statusRoutes');
 const feedBackRoutes = require('./routes/feedBackRoutes');
 const bookingRoutes = require('./routes/bookingRoutes');
 const refferalRoutes = require('./routes/refferalRoutes');
+const applyForLoanRoutes = require('./routes/applyForLoanRoutes');
+
 require('./utility/cronJobs');
 
 const cors = require('cors');
@@ -23,6 +25,7 @@ app.use('/fapi/status', statusRoutes); // Mount the routes
 app.use('/fapi/feedback', feedBackRoutes);
 app.use('/fapi/booking', bookingRoutes);
 app.use('/fapi/refferal', refferalRoutes);
+app.use('/fapi/applyforloan', applyForLoanRoutes);
 
 // Start server
 app.listen(PORT, () => {
