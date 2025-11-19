@@ -152,5 +152,69 @@ exports.sendUserFeedBackResolvedMail = (feedBack) => {
 }
 };
 
+exports.sendApplyForLoanMail = (adminEmails, applyForLoan) => {
+  try {
+    let mailOptions = {
+      from: process.env.EMAIL,   // Sender address
+      to: adminEmails,                // List of admin recipients
+      subject: `New Loan requirement Received: ${applyForLoan?.loantype?.type}`,  // Subject line
+      html: `
+          <div style="font-family: Arial, sans-serif; padding: 20px; background: #f7f7f7;">
+        <div style="max-width: 600px; margin: auto; background: #ffffff; padding: 20px; border-radius: 8px; border: 1px solid #ddd;">
+
+          <h2 style="color: #333; text-align: center;">📄 New Loan Requirement Received</h2>
+          <p style="font-size: 15px; color: #555;">
+            A user has requested a loan. Below are the details:
+          </p>
+
+          <hr style="margin: 20px 0;">
+
+          <h3 style="color: #333;">👤 Applicant Details</h3>
+          <p style="font-size: 14px; color: #444; line-height: 1.6;">
+            <strong>Name:</strong> ${applyForLoan?.name || 'N/A'} <br>
+            <strong>Mobile:</strong> ${applyForLoan?.mobile || 'N/A'} <br>
+            <strong>Address:</strong> ${applyForLoan?.address || 'N/A'} 
+          </p>
+
+          <h3 style="color: #333; margin-top: 20px;">💰 Loan Details</h3>
+          <p style="font-size: 14px; color: #444; line-height: 1.6;">
+            <strong>Loan Type:</strong> ${applyForLoan?.loantype?.type || 'N/A'} <br>
+            <strong>Loan Amount:</strong> ₹${applyForLoan?.loanAmount || 'N/A'}
+          </p>
+
+          <hr style="margin: 20px 0;">
+
+          <p style="font-size: 14px; color: #666;">
+            Please review the request and take necessary action.
+          </p>
+
+          <div style="text-align: center; margin-top: 25px;">
+            <a href="#" style="padding: 10px 20px; background: #1976d2; color: #fff; text-decoration: none; border-radius: 5px; font-size: 14px;">
+              View Application
+            </a>
+          </div>
+
+          <p style="font-size: 12px; color: #999; margin-top: 25px; text-align: center;">
+            This is an automated message. Please do not reply.
+          </p>
+
+        </div>
+      </div>
+      ` // HTML body
+    };
+
+    // Send email
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        return console.log('Error while sending mail to admins:', error);
+      }
+      console.log('Admin feedBack email sent successfully:', info.response);
+    });
+  
+} catch (err) {
+  console.log('Error while sending admin feedback mail:', err);
+}
+};
+
 
 

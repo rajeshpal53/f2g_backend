@@ -6,6 +6,7 @@ const Booking = require('./booking');
 const feedBack = require('./feedBack');
 const FeedBack = require('./feedBack');
 const LoanType = require('./loanType');
+const ApplyForLoan = require('./applyForLoan');
 
 const models = {
   User,
@@ -13,7 +14,8 @@ const models = {
   Refferal,
   Booking,
   Status,
-  LoanType
+  LoanType,
+  ApplyForLoan
 };
 
 User.hasMany(Booking, {foreignKey: 'usersfk', as: 'bookings'});
@@ -28,6 +30,8 @@ Refferal.belongsTo(Status, {foreignKey: 'statusfk', as: 'status'});
 Refferal.belongsTo(User, {foreignKey: 'usersfk', as: 'user'});
 Refferal.belongsTo(LoanType, {foreignKey: 'loantypefk', as: 'loantype'});
 Refferal.belongsTo(User, {foreignKey: 'refferedBy', as: 'refferedByUser'});
+
+ApplyForLoan.belongsTo(LoanType, {foreignKey: 'loantypefk', as: 'loantype' });
 
 sequelize.sync()
   // .sync({ alter: true })

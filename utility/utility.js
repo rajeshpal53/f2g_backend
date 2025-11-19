@@ -152,6 +152,12 @@ exports.sendCreateRefferalNotificationToAdmin = async(req) => {
     const adminEmails = admins.map((admin) => admin.email);
     mail.sendFeedBackMail(adminEmails, feedBack);
   }
+
+  exports.sendApplyForLoanMailToAdmin = async (applyForLoan) => {
+    const admins = await getAdmins();
+    const adminEmails = admins.map((admin) => admin.email);
+    mail.sendApplyForLoanMail(adminEmails, applyForLoan);
+  }
   
   exports.sendFeedBackResolvedMailToUser = async (feedBack) => {
     if(feedBack?.email){
