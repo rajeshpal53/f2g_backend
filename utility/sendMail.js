@@ -216,5 +216,61 @@ exports.sendApplyForLoanMail = (adminEmails, applyForLoan) => {
 }
 };
 
+exports.sendDbBackupMailToAdmin = (adminEmails, message) => {
+  try {
+
+    let mailOptions = {
+      from: process.env.EMAIL,   // Sender address
+      to: adminEmails,                  // List of admin recipients
+      subject: `Backup created`,  // Subject line
+      html: `
+        <h2>F2G Backup Report</h2>
+        <p>${message}</p>
+        `
+    };
+
+    // Send email
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        return console.log('Error while sending mail to admins:', error);
+      }
+      console.log('Admin backup email sent successfully:', info.response);
+    });
+  
+} catch (err) {
+  console.log('Error while sending admin backup mail:', err);
+}
+};
+
+exports.sendDbBackupFailedMailToAdmin = (adminEmails, error) => {
+  try {
+
+    let mailOptions = {
+      from: process.env.EMAIL,   // Sender address
+      to: adminEmails,                  // List of admin recipients
+      subject: `Backup Failed`,  // Subject line
+      html: `
+        <h2>F2G Backup FAILED</h2>
+            
+        <p>Error:</p>
+        <pre>${error}</pre>
+            
+        <p>Time: ${new Date().toLocaleString("en-IN")}</p>
+        `
+    };
+
+    // Send email
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        return console.log('Error while sending mail to admins:', error);
+      }
+      console.log('Admin backup failed email sent successfully:', info.response);
+    });
+  
+} catch (err) {
+  console.log('Error while sending admin backup failed mail:', err);
+}
+};
+
 
 
