@@ -64,7 +64,7 @@ function getDiskUsage(callback) {
   });
 }
 
-function sendBackupSummaryMail(deletedCount) {
+function sendBackupSummaryMail(deletedCount, filePath) {
 
   getDiskUsage(async (usage) => {
 
@@ -77,7 +77,13 @@ function sendBackupSummaryMail(deletedCount) {
         Time: ${new Date().toLocaleString("en-IN")}
         `;
 
-    await utility.sendAdminDbBackupMail(summary);
+    // Weekly attachment logic
+    const today = new Date().getDay();
+
+    // Sunday = 0
+    const shouldAttachBackup = today === 0;
+
+    await utility.sendAdminDbBackupMail(summary, shouldAttachBackup ? filePath : null);
 
   });
 }
@@ -127,7 +133,7 @@ cron.schedule("0 23 * * *", async () => {
       // ls -tp ${BACKUP_DIR}/*.sql | tail -n +21 | xargs rm --
       
       exec(
-        `ls -tp "${BACKUP_DIR}"/*.sql 2>/dev/null | tail -n +14 | tee /tmp/deleted_backups.log | xargs -r rm --`,
+        `ls -tp "${BACKUP_DIR}"/*.sql.gz 2>/dev/null | tail -n +14 | tee /tmp/deleted_backups.log | xargs -r rm --`,
         (err, stdout) => {
 
             let deletedCount = 0;
@@ -144,8 +150,21 @@ cron.schedule("0 23 * * *", async () => {
             console.log("🧹 No old backups removed");
           }
 
+          exec(`gzip -f ${filePath}`, async (zipErr) => {
+
+            if (zipErr) {
+              console.log(zipErr);
+              return;
+            }
+          
+            const zippedFile = `${filePath}.gz`;
+          
+            sendBackupSummaryMail(deletedCount, zippedFile);
+          
+          });
+
           // Pass count to mail
-          sendBackupSummaryMail(deletedCount);
+          // sendBackupSummaryMail(deletedCount, filePath);
 
         }
       );
