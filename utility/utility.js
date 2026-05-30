@@ -165,10 +165,10 @@ exports.sendCreateRefferalNotificationToAdmin = async(req) => {
     }
   }
 
-  exports.sendAdminDbBackupMail = async(message) => {
+  exports.sendAdminDbBackupMail = async(message, attachmentPath = null) => {
     const admins = await getAdmins();
     const adminEmails = admins.map((admin) => admin.email);
-    mail.sendDbBackupMailToAdmin(adminEmails, message);
+    mail.sendDbBackupMailToAdmin(adminEmails, message, attachmentPath);
   }
 
   exports.sendAdminDbBackupFailedMail = async(errorMsg) => {

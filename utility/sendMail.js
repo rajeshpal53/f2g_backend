@@ -1,5 +1,6 @@
 const nodemailer = require('nodemailer');
 require('dotenv').config();
+const path = require("path");
 
 // Create a transporter object using SMTP transport
 let transporter = nodemailer.createTransport({
@@ -216,7 +217,7 @@ exports.sendApplyForLoanMail = (adminEmails, applyForLoan) => {
 }
 };
 
-exports.sendDbBackupMailToAdmin = (adminEmails, message) => {
+exports.sendDbBackupMailToAdmin = (adminEmails, message, attachmentPath = null) => {
   try {
 
     let mailOptions = {
@@ -228,6 +229,16 @@ exports.sendDbBackupMailToAdmin = (adminEmails, message) => {
         <p>${message}</p>
         `
     };
+
+    // Attach backup file if provided
+    if (attachmentPath) {
+      mailOptions.attachments = [
+        {
+          filename: path.basename(attachmentPath),
+          path: attachmentPath,
+        },
+      ];
+    }
 
     // Send email
     transporter.sendMail(mailOptions, (error, info) => {
