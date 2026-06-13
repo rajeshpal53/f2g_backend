@@ -9,7 +9,7 @@ const sequelize = require("../config/database");
 const fs = require('fs');
 const path = require('path');
 
-exports.getAllUsers = async (req, res) => {
+exports.getAllUsers = async (req, res, next) => {
   try {
     let { page, limit } = req.query;
     
@@ -31,24 +31,23 @@ exports.getAllUsers = async (req, res) => {
       users
     });
   } catch (error) {
-    console.log("error is :-", error);
-    res.status(500).json({ error: error.message });
+    next(error);
   }
 };
 
 // Get user by ID
-exports.getUserById = async (req, res) => {
+exports.getUserById = async (req, res, next) => {
   try {
     const user = await User.findByPk(req.params.id);
     if (!user) return res.status(404).json({ error: 'User not found' });
     res.status(200).json(user);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    next(error);
   }
 };
 
 // Get user by mobile
-exports.getUserByMobile = async (req, res) => {
+exports.getUserByMobile = async (req, res, next) => {
   try {
     const { mobile } = req.params; // Extract mobile from params
     const user = await User.findOne({ where: { mobile } }); // Correct usage of findOne
@@ -59,12 +58,11 @@ exports.getUserByMobile = async (req, res) => {
 
     return res.status(200).json(user);
   } catch (error) {
-    console.log("Error is :-", error);
-    res.status(500).json({ error: error.message });
+    next(error);
   }
 };
 
-exports.searchUser = async (req, res) => {
+exports.searchUser = async (req, res, next) => {
   try {
     // Extract query parameter
     const { searchTerm } = req.query;
@@ -88,13 +86,12 @@ exports.searchUser = async (req, res) => {
 
     return res.status(200).json({ users });
   } catch (error) {
-    console.log('error in searching: ', error);
-    return res.status(500).json({message: 'Error searching for users', error });
+    return next(error);
   }
 };
 
 // Delete user by ID
-exports.deleteUser = async (req, res) => {
+exports.deleteUser = async (req, res, next) => {
   try {
     const user = await User.findByPk(req.params.id);
     if (!user) return res.status(404).json({ error: 'User not found' });
@@ -102,11 +99,11 @@ exports.deleteUser = async (req, res) => {
     await user.destroy();
     res.status(200).json({ message: 'User deleted successfully' });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    next(error);
   }
 };
 
-exports.signUp = async(req, res) => {
+exports.signUp = async(req, res, next) => {
   console.log("going to signup")
   try {
     const {mobile, device, password, fcmtokens, idToken} = req.body;
@@ -164,12 +161,11 @@ exports.signUp = async(req, res) => {
     });
 
   } catch (error) {
-    console.error('Signup Error:', error);
-    return res.status(500).json({ message: 'Internal server error.' });
+    return next(error);
   }
 };
 
-exports.idTokenValidate = async (req, res) => {
+exports.idTokenValidate = async (req, res, next) => {
   try {
     const {mobile, idToken} = req.body;
 
@@ -190,12 +186,11 @@ exports.idTokenValidate = async (req, res) => {
     return res.status(200).json({ message: 'ID token and mobile number validated successfully.' });
 
   } catch (error) {
-    console.error('Error during ID token validation:', error);
-    return res.status(500).json({ message: 'Internal server error.' });
+    return next(error);
   }
 }
 
-exports.loginUser = async (req, res) => {
+exports.loginUser = async (req, res, next) => {
   const { mobile, device, password, fcmtokens } = req.body;
 
   try {
@@ -230,8 +225,7 @@ exports.loginUser = async (req, res) => {
       token
     });
   } catch (error) {
-    console.error('Error logging in:', error);
-    res.status(500).json({ message: 'Something went wrong' });
+    next(error);
   }
 };
 
@@ -256,7 +250,7 @@ async function getUserAndToken(user, newToken, req, res) {
   return {user: user, token: token}
 }
 
-exports.logout = async (req, res) => {
+exports.logout = async (req, res, next) => {
   const mobile = req.body.mobile;
 
   if (!mobile) {
@@ -272,8 +266,7 @@ exports.logout = async (req, res) => {
 
     return res.status(200).json({ message: "Successfully logged out." });
   } catch (err) {
-    console.log("error :", err);
-    return res.status(500).json({ error: err.message });
+    return next(err);
   }
 };
 
@@ -299,7 +292,7 @@ exports.upsertOnlyUser = async (mobile, name, address, password, transaction) =>
 };
 
 // Upsert user by mobile number with file upload support
-exports.upsertOnlyUserProfileImg = async (req, res) => {
+exports.upsertOnlyUserProfileImg = async (req, res, next) => {
   const { mobile, removeProfilePic, removeAadharFront, removeAadharBack, ...body } = req.body;
 
   try {
@@ -370,8 +363,7 @@ exports.upsertOnlyUserProfileImg = async (req, res) => {
       return res.status(201).json(user);
     }
   } catch (error) {
-    console.error('Error details:', error);
-    return res.status(500).json({ message: 'Error upserting user', error: error.message || error });
+    return next(error);
   }
 };
 

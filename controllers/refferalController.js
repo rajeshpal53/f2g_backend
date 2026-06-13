@@ -11,7 +11,7 @@ const { downloadReport } = require("../utility/report");
 const utility = require('../utility/utility');
 
 // create booking
-exports.createRefferal = async (req, res) => {
+exports.createRefferal = async (req, res, next) => {
   const {
     name,
     refferedBy,
@@ -63,12 +63,11 @@ exports.createRefferal = async (req, res) => {
 
     res.status(201).json(refferal);
   } catch (error) {
-    await transaction.rollback(); // Rollback on error
-    console.error("error is:-", error);
-    res.status(500).json({ message: 'Internal server error', error: error.message });
+    await transaction.rollback();
+    return next(error);
   }
 };
-  
+
 // Update a feedback
 exports.updateRefferal = async (req, res) => {
   try {
@@ -98,7 +97,7 @@ exports.updateRefferal = async (req, res) => {
   }
 };
 
-exports.getRefferal = async (req, res) => {
+exports.getRefferal = async (req, res, next) => {
   try {
     let { dateRange, statusfk, startDate, endDate, year, month, week, calenderView, sort, sortField, searchTerm, id, usersfk, refferedBy, loantypefk, page, limit } = req.query;
     let whereClause = {};
@@ -284,12 +283,11 @@ exports.getRefferal = async (req, res) => {
     });
 
   } catch (error) {
-    console.error(error);
-    return res.status(500).json({ success: false, message: 'Server error' });
+    return next(error);
   }
 };
 
-exports.getRefferalStats = async (req, res) => {
+exports.getRefferalStats = async (req, res, next) => {
   try {
     const { dateRange, startDate, endDate, year, month, refferedBy, usersfk } = req.query;
 
@@ -448,12 +446,11 @@ exports.getRefferalStats = async (req, res) => {
     });
 
   } catch (error) {
-    console.error("Error fetching refferal stats:", error);
-    return res.status(500).json({ success: false, message: "Internal server error" });
+    return next(error);
   }
 };
 
-exports.downloadRefferals = async (req, res) => {
+exports.downloadRefferals = async (req, res, next) => {
   try {
     let { dateRange, statusfk, startDate, endDate, year, month, week, calenderView, sort, sortField, searchTerm, id, usersfk, refferedBy, loantypefk, type} = req.query;
     if(!type){
@@ -692,8 +689,7 @@ exports.downloadRefferals = async (req, res) => {
     }
 
   } catch (error) {
-    console.error("Error downloading referrals:", error);
-    res.status(500).json({ message: "Error downloading referrals:", error: error.message });
+    next(error);
   }
 };
   
