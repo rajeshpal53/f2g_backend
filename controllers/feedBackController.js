@@ -5,7 +5,7 @@ const sequelize = require('../config/database');
 const utility = require('../utility/utility');
 
 // Create a feedBack
-exports.createFeedBack = async (req, res) => {
+exports.createFeedBack = async (req, res, next) => {
     try {
         const {body} = req;
         const screenShotUrl = req.savedFiles?.screenShotUrl || null;
@@ -23,8 +23,7 @@ exports.createFeedBack = async (req, res) => {
 
       return res.status(201).json(feedBack);
     } catch (error) {
-        console.log("error is:- ", error);
-        return res.status(400).json({ error: error.message });
+    return next(error);
     }
   };
   

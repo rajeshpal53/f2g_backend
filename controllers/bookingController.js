@@ -11,7 +11,7 @@ const { downloadReport } = require("../utility/report");
 const utility = require('../utility/utility');
 
 // create booking
-exports.createBooking = async (req, res) => {
+exports.createBooking = async (req, res, next) => {
   const {
     name,
     bookedBy,
@@ -69,9 +69,8 @@ exports.createBooking = async (req, res) => {
 
     res.status(201).json(booking);
   } catch (error) {
-    await transaction.rollback(); // Rollback on error
-    console.error("error is:-", error);
-    res.status(500).json({ message: 'Internal server error', error: error.message });
+    await transaction.rollback();
+    return next(error);
   }
 };
   
@@ -103,7 +102,7 @@ exports.updateBooking = async (req, res) => {
   }
 };
 
-exports.getBooking = async (req, res) => {
+exports.getBooking = async (req, res, next) => {
   try {
     let { dateRange, statusfk, startDate, endDate, year, month, week, calenderView, sort, sortField, searchTerm, id, usersfk, bookedBy, loantypefk, page, limit } = req.query;
     let whereClause = {};
@@ -290,12 +289,11 @@ exports.getBooking = async (req, res) => {
     });
 
   } catch (error) {
-    console.error(error);
-    return res.status(500).json({ success: false, message: 'Server error' });
+    return next(error);
   }
 };
 
-exports.getBookingStats = async (req, res) => {
+exports.getBookingStats = async (req, res, next) => {
   try {
     const { dateRange, startDate, endDate, year, month, bookedBy, usersfk } = req.query;
 
@@ -454,12 +452,11 @@ exports.getBookingStats = async (req, res) => {
     });
 
   } catch (error) {
-    console.error("Error fetching booking stats:", error);
-    return res.status(500).json({ success: false, message: "Internal server error" });
+    return next(error);
   }
 };
 
-exports.downloadBookings = async (req, res) => {
+exports.downloadBookings = async (req, res, next) => {
   try {
     let { dateRange, statusfk, startDate, endDate, year, month, week, calenderView, sort, sortField, searchTerm, id, usersfk, bookedBy, loantypefk, type} = req.query;
     if(!type){
@@ -702,11 +699,10 @@ exports.downloadBookings = async (req, res) => {
     }
 
   } catch (error) {
-    console.error("Error downloading bookings:", error);
-    res.status(500).json({ message: "Error downloading bookings:", error: error.message });
+    next(error);
   }
 };
-  
+
 // Delete a feedback
 exports.deleteBooking = async (req, res) => {
   try {

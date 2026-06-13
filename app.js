@@ -1,5 +1,16 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+require('dotenv').config();
+
+const monitor = require('./sdk');
+monitor.init({
+  appName:    'F2G',
+  apiKey:     process.env.API_KEY,
+  serviceUrl: process.env.SERVICE_URL,
+  serverName: 'PM 2',
+  environment: process.env.NODE_ENV,
+});
+
 const userRoutes = require('./routes/userRoutes');
 const statusRoutes = require('./routes/statusRoutes');
 const feedBackRoutes = require('./routes/feedBackRoutes');
@@ -27,7 +38,21 @@ app.use('/fapi/booking', bookingRoutes);
 app.use('/fapi/refferal', refferalRoutes);
 app.use('/fapi/applyforloan', applyForLoanRoutes);
 
+app.use(monitor.expressErrorHandler);
+
+// Final JSON error response handler
+app.use((err, req, res, next) => {
+  console.log("error is:-", err);
+  res.status(err.status || 500).json({ message: err.message || 'Internal server error' });
+});
+
 // Start server
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
+});
+
+app.get('/health', (req, res) => {
+  res.status(200).json({
+    status: 'UP'
+  });
 });
