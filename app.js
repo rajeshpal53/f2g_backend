@@ -7,7 +7,7 @@ monitor.init({
   appName:    'F2G',
   apiKey:     process.env.API_KEY,
   serviceUrl: process.env.SERVICE_URL,
-  serverName: 'PM 2',
+  serverName: process.env.SERVER_NAME,
   environment: process.env.NODE_ENV,
 });
 
@@ -21,8 +21,6 @@ const applyForLoanRoutes = require('./routes/applyForLoanRoutes');
 require('./utility/cronJobs');
 
 const cors = require('cors');
-
-require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 3001;
