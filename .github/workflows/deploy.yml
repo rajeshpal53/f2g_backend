@@ -38,3 +38,4 @@ jobs:
         env:
           VPS_APP_PATH: ${{ secrets.VPS_APP_PATH }}
           PM2_APP_NAME: ${{ secrets.PM2_APP_NAME }}
+ 
