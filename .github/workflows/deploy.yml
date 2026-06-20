@@ -19,16 +19,23 @@ jobs:
           port: ${{ secrets.VPS_PORT }}
           envs: VPS_APP_PATH,PM2_APP_NAME 
           script: | 
-            set -ex
+            set -e
 
-            whoami
-            ssh -T git@github.com || true
-
+            echo "📂 Going to project folder..."
             cd $VPS_APP_PATH
 
-            git remote -v
+            echo "📦 Pulling latest code..."
+            git fetch --all
+            git reset --hard origin/main
 
-            git fetch origin
+            echo "📥 Installing dependencies..."
+            npm ci --omit=dev
+
+            echo "🔄 Restarting PM2..."
+            pm2 reload ecosystem.config.js --update-env || pm2 restart $PM2_APP_NAME
+            pm2 save
+
+            echo "✅ Deployment successful!"
         env:
           VPS_APP_PATH: ${{ secrets.VPS_APP_PATH }}
           PM2_APP_NAME: ${{ secrets.PM2_APP_NAME }}
