@@ -33,9 +33,4 @@ Refferal.belongsTo(User, {foreignKey: 'refferedBy', as: 'refferedByUser'});
 
 ApplyForLoan.belongsTo(LoanType, {foreignKey: 'loantypefk', as: 'loantype' });
 
-sequelize.sync()
-  // .sync({ alter: true })
-  .then(() => console.log('Database synced'))
-  .catch((error) => console.error('Error syncing database:', error));
-
 module.exports = models;
