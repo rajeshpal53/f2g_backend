@@ -17,7 +17,7 @@ jobs:
           key: ${{ secrets.VPS_SSH_KEY }}
           passphrase: ${{ secrets.VPS_SSH_PASSPHRASE }}
           port: ${{ secrets.VPS_PORT }}
-          envs: VPS_APP_PATH,PM2_APP_NAME
+          envs: VPS_APP_PATH,PM2_APP_NAME 
           script: |
             set -e
 
